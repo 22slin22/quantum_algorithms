@@ -61,7 +61,7 @@ qc.measure(cells, c)
 print(qc.draw(output='latex_source'))
 
 print("Starting simulation")
-job = execute(qc, simulator, shots=40000)
+job = execute(qc, simulator, shots=10000)
 
 result = job.result()
 

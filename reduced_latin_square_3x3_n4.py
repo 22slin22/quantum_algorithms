@@ -149,9 +149,10 @@ for k, v in counts.items():
     if v > 40:
         c1, c2, c3, c4 = k[0:2], k[2:4], k[4:6], k[6:8]
         c1, c2, c3, c4 = int(c1, base=2), int(c2, base=2), int(c3, base=2), int(c4, base=2)
-        print(c1, c2)
-        print(c3, c4)
-        print()
+        print("\\latinThreeSmall{{1}}{{2}}{{3}}{{2}}{{{}}}{{{}}}{{3}}{{{}}}{{{}}}".format(c1+1, c2+1, c3+1, c4+1))
+        #print(c1, c2)
+        #print(c3, c4)
+        #print()
 
 plot_histogram(counts).show()
 plt.show()

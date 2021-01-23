@@ -4,6 +4,8 @@ from qiskit.visualization import plot_histogram
 
 import matplotlib.pyplot as plt
 
+import time
+
 simulator = Aer.get_backend('qasm_simulator')
 
 
@@ -143,9 +145,13 @@ qc.measure(all_qubits(cells), c)
 # print(qc.draw())
 
 print("Starting simulation")
-job = execute(qc, simulator, shots=1024)
+time_start = time.time()
+job = execute(qc, simulator, shots=10000)
 
 result = job.result()
+
+time_end = time.time()
+print("Simulation took", time_end - time_start)
 
 print(result)
 
@@ -153,7 +159,7 @@ counts = result.get_counts(qc)
 print("Counts are:", counts)
 
 for k, v in counts.items():
-    if v > 40:
+    if v > 100:
         c1, c2, c3, c4 = k[0:2], k[2:4], k[4:6], k[6:8]
         c1, c2, c3, c4 = int(c1, base=2), int(c2, base=2), int(c3, base=2), int(c4, base=2)
         print(c1, c2)

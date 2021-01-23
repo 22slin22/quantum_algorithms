@@ -12,13 +12,12 @@ clause_list = row_constraints + column_constraints
 clause_list_len = len(clause_list)
 
 
-def sudoku_oracle(qc, clause_list, cells, ancillas1, ancillas2, output):
+def oracle(qc, clause_list, cells, ancillas1, ancillas2, output):
     for (c1, c2), a1, a2 in zip(clause_list, ancillas1, ancillas2):
         compare_cells(qc, cells[c1], cells[c2], a1, a2, reverse=False)
 
-    # And all ancillas together to check if sudoku is valid
+    # And all ancilla qubits together to check if latin square is valid
     qc.mcx(ancillas2, output)
-    qc.x(output)
 
     for (c1, c2), a1, a2 in zip(clause_list, ancillas1, ancillas2):
         compare_cells(qc, cells[c1], cells[c2], a1, a2, reverse=True)
@@ -57,11 +56,6 @@ def grover_diffusion(qc, cells):
 
 
 def all_qubits(registers):
-    """
-    Returns a list of qubits given a list of QuantumRegister
-    :param registers: List of QuantumRegister
-    :return: List of qubits
-    """
     return [q for r in registers for q in r]
 
 
@@ -79,17 +73,19 @@ Define algorithm
 '''
 qc.h(all_qubits(cells))
 
-for _ in range(3):
-    # for _ in range(2):
-    sudoku_oracle(qc, clause_list, cells, ancillas1, ancillas2, output)
-    grover_diffusion(qc, cells)
+# Initialize output qubit to state |->
+qc.x(output)
+qc.h(output)
+
+oracle(qc, clause_list, cells, ancillas1, ancillas2, output)
+grover_diffusion(qc, cells)
 
 qc.measure(all_qubits(cells), c)
 
 # print(qc.draw())
 
 print("Starting simulation")
-job = execute(qc, simulator, shots=40000)
+job = execute(qc, simulator, shots=10000)
 
 result = job.result()
 
@@ -99,12 +95,15 @@ counts = result.get_counts(qc)
 print("Counts are:", counts)
 
 for k, v in counts.items():
-    if v > 200:
+    if v > 50:
         c1, c2, c3, c4 = k[0:2], k[2:4], k[4:6], k[6:8]
         c1, c2, c3, c4 = int(c1, base=2), int(c2, base=2), int(c3, base=2), int(c4, base=2)
-        print(c1, c2)
-        print(c3, c4)
-        print()
+        #print(c1, c2)
+        #print(c3, c4)
+        #print()
+        print("\\latinTwoSmall{{{}}}{{{}}}{{{}}}{{{}}}".format(c1, c2, c3, c4))
+
+print(sum(v for v in counts.values() if v > 50) / 10000)
 
 plot_histogram(counts).show()
 plt.show()
